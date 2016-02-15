@@ -32,4 +32,4 @@ Make the communication bi-directional. Add client side web interface to control 
 
   - p5.js
   - platformio
-  - [Excellent tutorial bringing it all together][https://itp.nyu.edu/physcomp/labs/labs-serial-communication/lab-serial-communication-with-node-js/]
+  - [Excellent tutorial bringing it all together](https://itp.nyu.edu/physcomp/labs/labs-serial-communication/lab-serial-communication-with-node-js/])
