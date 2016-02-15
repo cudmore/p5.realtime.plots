@@ -2,10 +2,7 @@
 <head>
   <meta charset="UTF-8">
   <style> body {padding: 0; margin: 0;} </style>
-</head>
 
-
-<body>
 	<!-- <script src="d3.v3.min.js"></script> -->
 
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -14,28 +11,35 @@
 
 	<script type="text/javascript">
 	
-    google.charts.load('current', {'packages':['table']});
+    google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawTable);
 
+	//var myFile = 'https://github.com/cudmore/p5.realtime.plots/blob/master/imagebrowser/table/a153_hs1_tp0.csv'
+	var myFile = 'a153_hs1_tp0.csv'
+	
 	// this has to be a global function
 	function drawTable() {
 	   // grab the CSV
-	   $.get("a153_hs1_tp0.csv", function(csvString) {
+	   $.get(myFile, function(csvString) {
 		  // transform the CSV string into a 2-dimensional array
-		  var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
+		  //var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
+		  var arrayData = $.csv.toArrays(csvString);
+		  //var arrayData = $.csv.toObjects(csvString);
+
+			console.log(arrayData)
 
 		  // this new DataTable object holds all the data
 		  var data = new google.visualization.arrayToDataTable(arrayData);
 
 		  // this view can select a subset of the data at a time
 		  var view = new google.visualization.DataView(data);
-		  view.setColumns([0,1]);
+		  view.setColumns([0,5]);
 
 		 // set chart options
 		 var options = {
 			title: "A Chart from a CSV!",
-			hAxis: {title: data.getColumnLabel(0), minValue: data.getColumnRange(0).min, maxValue: data.getColumnRange(0).max},
-			vAxis: {title: data.getColumnLabel(1), minValue: data.getColumnRange(1).min, maxValue: data.getColumnRange(1).max},
+			hAxis: {title: data.getColumnLabel(2), minValue: data.getColumnRange(2).min, maxValue: data.getColumnRange(2).max},
+			vAxis: {title: data.getColumnLabel(3), minValue: data.getColumnRange(3).min, maxValue: data.getColumnRange(3).max},
 			legend: 'none'
 		 };
 
@@ -46,6 +50,10 @@
 	}
 	</script>
 
+</head>
+
+
+<body>
 
 	<div id="chart"></div>
 
