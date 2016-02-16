@@ -11,11 +11,20 @@
 
 	<script type="text/javascript">
 	
-    google.charts.load('current', {'packages':['corechart']});
+	//google.charts.load('current', {'packages':['corechart']});
+    google.charts.load('current', {'packages':['table', 'corechart']});
     google.charts.setOnLoadCallback(drawTable);
 
+	//python -m SimpleHTTPServer
 	//var myFile = 'https://github.com/cudmore/p5.realtime.plots/blob/master/imagebrowser/table/a153_hs1_tp0.csv'
 	var myFile = 'a153_hs1_tp0.csv'
+	
+	//var xVals = [];
+	//var yVals = [];
+	//var zVals = [];
+	var xyVals = [];
+	//var newArrayData = [];
+	var colList = [];
 	
 	// this has to be a global function
 	function drawTable() {
@@ -23,29 +32,63 @@
 	   $.get(myFile, function(csvString) {
 		  // transform the CSV string into a 2-dimensional array
 		  //var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
-		  var arrayData = $.csv.toArrays(csvString);
 		  //var arrayData = $.csv.toObjects(csvString);
+		  var arrayData = $.csv.toArrays(csvString);
 
-			console.log(arrayData)
-
+			xyVals[0] = ["x", "y"];
+			//newArrayData[0] = arrayData[0];
+			var mRow = arrayData.length;
+			var nCol = arrayData[0].length;
+			for (i=1; i<mRow; i++) {
+				//newArrayData[i] = parseFloat(arrayData[i]);
+				
+				//xVals[i-1] = parseFloat(arrayData[i][2]);
+				//yVals[i-1] = parseFloat(arrayData[i][3]);
+				//zVals[i-1] = parseFloat(arrayData[i][4]);
+				xyVals[i] = [parseFloat(arrayData[i][2]),parseFloat(arrayData[i][3])];
+			}
+			
+			colList[0] = ['idx', 'stat'];
+			for (j=0; j<nCol; j++) {
+				colList[j+1] = [j, arrayData[0][j]];
+			}
+				
 		  // this new DataTable object holds all the data
-		  var data = new google.visualization.arrayToDataTable(arrayData);
+		  var data = new google.visualization.arrayToDataTable(arrayData); //str
 
-		  // this view can select a subset of the data at a time
-		  var view = new google.visualization.DataView(data);
-		  view.setColumns([0,5]);
-
-		 // set chart options
-		 var options = {
-			title: "A Chart from a CSV!",
-			hAxis: {title: data.getColumnLabel(2), minValue: data.getColumnRange(2).min, maxValue: data.getColumnRange(2).max},
-			vAxis: {title: data.getColumnLabel(3), minValue: data.getColumnRange(3).min, maxValue: data.getColumnRange(3).max},
-			legend: 'none'
+		//
+		//table
+		var options = {
+			title: "A Table from a CSV",
+			showRowNumber: false,
+			width: '80%',
+			height: '50%'
 		 };
+		var table = new google.visualization.Table(document.getElementById('table_div'));
+        table.draw(data, options);
 
-		 // create the chart object and draw it
-		 var chart = new google.visualization.ScatterChart(document.getElementById('chart'));
-		 chart.draw(view, options);
+		//
+		// x/y plot
+		 var options = {
+			title: "A Scatter from a CSV",
+			width: '80%',
+			height: '50%'
+		 };
+        var scatterData = google.visualization.arrayToDataTable(xyVals);
+		var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+        chart.draw(scatterData, options);
+
+		//
+		//list of stats
+		var options = {
+			title: "A list of stats",
+			showRowNumber: false,
+			width: '100px',
+			height: '200px'
+		 };
+        var statData = google.visualization.arrayToDataTable(colList);
+		var statListTable = new google.visualization.Table(document.getElementById('statlist_div'));
+        statListTable.draw(statData, options);
 	  });
 	}
 	</script>
@@ -55,7 +98,18 @@
 
 <body>
 
-	<div id="chart"></div>
-
+	<div id="table_div"></div>
+	<BR>
+	<div id="chart_div"></div>
+	<BR>
+	<div id="statlist_div"></div>
+	<BR>
+	<P>
+	Now parse column headers into a list and display list twice. Once for 'x', again for 'y'. Add plot button and plot based on column selection.
+	</p>
+	<p>Selection in table should highlight in plot and vica-versa.</p>
+	<p>Integrate this with the image browser!!!</p>
+	
+	
 </body>
 </html>
