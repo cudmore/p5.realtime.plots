@@ -1,10 +1,11 @@
-var canvasWidth = 300;
-var canvasHeight = 300;
+var canvasWidth = 320;
+var canvasHeight = 320;
 
 var lowerSlider, upperSlider
 
-var pos = 25;
+var images = [];
 var currentSlice = 0;
+var numSlices = 11;
 var button;
 
 function setup() {
@@ -21,14 +22,19 @@ function setup() {
  
 }
 
-function draw() {
-  background(237, 34, 93);
-  fill(0);
-  rect(25, pos, 50, 50);
+//a predefined p5 function, like draw()
+function preload() {
+	images[currentSlice] = loadImage("images/Untitled_" + currentSlice + ".png");  // Load the image
+}
 
+function draw() {
 	var lowerSliderVal = lowerSlider.value();
 	var upperSliderVal = upperSlider.value();
 	//canvas.background(lowerSliderVal, upperSliderVal, 93);
+	
+	if (images[currentSlice] != null) {
+		image(images[currentSlice]);
+	}
 
 }
 
@@ -46,14 +52,30 @@ function mouseisincanvas() {
 
 //global
 function mouseWheel(event) {
-  //print(event.delta);
-  //move the square according to the vertical scroll amount
   if (mouseisincanvas()) {
-  		pos += 5 * event.delta;
-  		//uncomment to block page scrolling
-		return false;
+  		//print(event.delta); //up is +1, down is -1
+  		currentSlice -= event.delta;
+  		if (currentSlice<0) { currentSlice=0; }
+  		else if (currentSlice>numSlices-1) { currentSlice = numSlices-1; }
+  		
+  		if (images[currentSlice] == null) {
+  			images[currentSlice] = loadImage("images/Untitled_" + currentSlice + ".png");  // Load the image
+		}
+  		
+		images[currentSlice].loadPixels();
+  		print("a " + images[currentSlice].pixels[0]);
+  		print("b pixel length " + images[currentSlice].pixels.length);
+  		var black = color(199);
+		images[currentSlice].pixels[0] = black;
+  		print("c" + images[currentSlice].pixels[0]);
+  		print("d pixel length " + images[currentSlice].pixels.length);
+  		images[currentSlice].updatePixels();
+  		//print("c" + images[currentSlice].pixels[0]);
+		image(images[currentSlice]);
+  		
+		return false; //blocks page scrolling
 	} else {
-		return true
+		return true //allow page scrolling
 	}
 }
 
