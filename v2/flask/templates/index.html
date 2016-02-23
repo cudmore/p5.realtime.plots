@@ -7,6 +7,8 @@
 
     <script src="http://code.highcharts.com/highcharts.js"></script> 
 
+	<link rel="stylesheet" href="static/Font-Awesome-master/css/font-awesome.min.css">
+
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function(){
             //namespace = '/test'; // change to an empty string to use the global namespace
@@ -16,6 +18,24 @@
             // this is specially important when using the global namespace
             var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
 		
+			$("#connectArduino").click(function() {
+				socket.emit('connectArduino', {data: $('#serialPortID').val()});
+				//$("#ex1").slider("enable");
+                return false;
+			});
+
+			$("#startarduinoButtonID").click(function() {
+				socket.emit('startarduinoButtonID', {data: ''});
+				//$("#ex1").slider("enable");
+                return false;
+			});
+
+			$("#stoparduinoButtonID").click(function() {
+				socket.emit('stoparduinoButtonID', {data: ''});
+				//$("#ex1").slider("enable");
+                return false;
+			});
+
             socket.on('newdata', function(msg) {
             	//console.log('a)' + msg.data);
                 $('#newDataID').empty().append(msg.data);
@@ -62,6 +82,7 @@
                 socket.emit('disconnect request');
                 return false;
             });
+
 
 //<!-- -->
 //    <div id="chart" style="width:100%; height:400px;"></div>
@@ -119,6 +140,25 @@
 
 </head>
 <body>
+
+ 	<div style="font-size:2.5em; float: right;">
+ 	<A HREF="data"><i class="fa fa-database"></i></A> 
+    <A HREF="p5">p5</a>
+	</div>
+
+ 	<BR>
+ 	
+		<button id="startarduinoButtonID">
+		  <i class="fa fa-play fa-2x"></i>
+		</button>
+		<button id="stoparduinoButtonID">
+		  <i class="fa fa-stop fa-2x"></i>
+		</button>
+
+ 	<BR>
+		<input type="text" name="serialPortID" id="serialPortID" value="/dev/xxx">
+		<button id="connectArduino">Connect To Arduino</button>
+		
     <h1>Flask-SocketIO Test</h1>
     <h2>Send:</h2>
     <form id="emit" method="POST" action='#'>
