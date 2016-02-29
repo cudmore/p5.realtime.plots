@@ -28,6 +28,11 @@
 			    inString = msg; // used in draw() to call graphData(inString)
 			    //print(msg.x);
             });
+            
+            socket.on('serialdata', function(msg) {
+                console.log(msg);
+                $('#serialDataID').empty().append(msg);
+            });
 		});
 		 
 	// Author: Robert Cudmore
@@ -147,7 +152,8 @@
  </UL>
  
   
- <div id="newDataID"></div>
+ <div id="serialDataID">serialDataID</div>
+ <div id="newDataID">newDataID</div>
  <div id="socketStatusID">Server Status: None</div>
  <div id="serverTimeID"></div>
  <div id="arduinoMillisID"></div>

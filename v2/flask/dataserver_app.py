@@ -4,11 +4,15 @@
 #
 from flask import Flask, abort, render_template, send_file
 from flask.ext.socketio import SocketIO, emit
+#from flaskext.markdown import Markdown
+from flask.ext.misaka import Misaka
 import random # testing
 import os, time, random
 from datetime import datetime
 from threading import Thread
 import eventlet
+
+import bSerial
 
 from settings import APP_ROOT
 
@@ -17,24 +21,33 @@ app.config['SECRET_KEY'] = 'secret!'
 app.debug = True
 app.config['DATA_FOLDER'] = 'data/'
 
+#Markdown(app)
+Misaka(app, fenced_code=True)
 socketio = SocketIO(app)
 
 #namespace = '/test'
 namespace = ''
 
 thread = None #second thread used by background_thread()
+ser = None
 
 #see: https://github.com/miguelgrinberg/Flask-SocketIO/issues/192
 eventlet.monkey_patch()
 
+#b = bSerial.bSerial(socketio)
+
 def background_thread():
     """Example of how to send server generated events to clients."""
     while True:
-        time.sleep(1.0)
+        time.sleep(0.5)
         response = MakeServerResponse()        
-        #print 'background_thread:' + response['currenttime']
-        socketio.emit('newdata', {'data': response['currenttime']}, namespace=namespace)
-        socketio.emit('temperatureUpdate', response, namespace=namespace)
+        #socketio.emit('newdata', {'data': response['currenttime']}, namespace=namespace)
+        #socketio.emit('temperatureUpdate', response, namespace=namespace)
+
+        #serialdata = b.read().rstrip() #comes in with \r\n
+        #serialdata = serialdata.rstrip()
+        #print('serialdata:', serialdata)
+        #socketio.emit('serialdata', serialdata, namespace=namespace)
 
 def MakeServerResponse():
     now = datetime.now()
@@ -53,6 +66,10 @@ def MakeServerResponse():
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/readme')
+def readme():
+    return render_template('readme.md')
 
 #from: http://stackoverflow.com/questions/23718236/python-flask-browsing-through-directory-with-files
 @app.route('/', defaults={'req_path': ''})
@@ -78,6 +95,10 @@ def dir_listing(req_path):
 def index_highchart():
     return render_template('p5.html')
 
+@app.route('/grafica')
+def index_grafica():
+    return render_template('grafica.html')
+
 @socketio.on('connectArduino', namespace=namespace) #responds to echo
 def connectArduino(message):
     emit('my response', {'data': message['data']})
@@ -87,11 +108,13 @@ def connectArduino(message):
 def startarduinoButton(message):
     #emit('my response', {'data': message['data']})
     print 'startarduinoButtonID'
-
+    ser.write('startTrial')
+    
 @socketio.on('stoparduinoButtonID', namespace=namespace) #responds to echo
 def stoparduinoButtonID(message):
     #emit('my response', {'data': message['data']})
     print 'stoparduinoButtonID'
+    ser.write('stopTrial')
     
 @socketio.on('my event', namespace=namespace) #responds to echo
 def test_message(message):
@@ -116,6 +139,9 @@ if __name__ == '__main__':
         thread.daemon  = True; #as a daemon the thread will stop when *this stops
         thread.start()
 
+        ser = bSerial.bSerial(socketio)
+        ser.start()
+		
         print('starting server')
         socketio.run(app, host='0.0.0.0', port=5010, use_reloader=True)
         print('finished')
